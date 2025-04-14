@@ -13,6 +13,9 @@
 #include "http_data.h"
 
 #define MAX_RESPONSE_HEADER 30
+#define HTTP_MSG_SIZE 8192
+#define PATH_SIZE 1024
+#define HTTP_VERSION_SIZE 16
 //响应头结构定义
 typedef struct 
 {
@@ -21,15 +24,17 @@ typedef struct
 
 extern char *ret_head;
 extern char *ret_head2;
+
 typedef struct{
-    char http_version[50];
     char* http_status_msg;
     int http_status_code_name;
     int http_status_code;
     int response_bytes;
-    char http_msg[99999];
     char type;
-    char path[BUF_SIZE];
+    int method;
+    char http_msg[HTTP_MSG_SIZE];
+    char path[PATH_SIZE];
+    char http_version[HTTP_VERSION_SIZE];
 }Response;
 
 extern Response* make_response(Request* request);

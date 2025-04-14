@@ -27,7 +27,7 @@ typedef struct {
 
 
 enum { code400, code404, code501, code200, code505 };
-enum { GET, POST, HEAD, UKNOWN, ERROR };
+enum { GET=2, POST, HEAD, UKNOWN, ERROR };
 
 // 如果有全局数据需要共享，使用 extern 声明
 

@@ -93,16 +93,30 @@ int main(int argc, char* argv[])
     read_from_file(filePath, msg);
 
     int bytes_received;
-    fprintf(stdout, "-------Sending-------\n");
-    fprintf(stdout, "%s", msg);
+    // fprintf(stdout, "-------Sending-------\n");
+    // fprintf(stdout, "%s", msg);
 
     send(sock, msg, strlen(msg), 0);
+    fprintf(stdout, "\n-------Sending-------\n");
+    fprintf(stdout, "%s", msg);
 
-    if ((bytes_received = recv(sock, buf, BUF_SIZE, 0)) > 0) {
+    // 修改接收逻辑
+    fprintf(stdout, "(msg_over)\n-------Received-------\n");
+    int total_received = 0;
+    while (1) {
+        memset(buf, 0, BUF_SIZE);
+        int bytes_received = recv(sock, buf, BUF_SIZE - 1, 0);
+        // printf("Received %d bytes\n", bytes_received);
+        if (bytes_received <= 0) {
+            break;  // 连接关闭或出错
+        }
+        
         buf[bytes_received] = '\0';
-        fprintf(stdout, "-------Received-------\n");
         fprintf(stdout, "%s", buf);
+        total_received += bytes_received;
     }
+
+    fprintf(stdout, "\nTotal bytes received: %d\n", total_received);
 
     freeaddrinfo(servinfo);
     close(sock);

@@ -12,10 +12,8 @@ char* user_log_format[] = {
 /* 日志格式存储变量 */
 Log_Format log_fromat[5];
 
-/* 批量调用 hook 函数相关 */
 hook_group hook_zzhi = {0};
 
-/* 以下是函数实现 */
 
 void get_other_msg(Request *r, int response_status, int response_bytes, char *error_message, char* client_ip) {
     if (r == NULL) {
@@ -25,7 +23,7 @@ void get_other_msg(Request *r, int response_status, int response_bytes, char *er
     r->error_message = error_message;
     r->response_status = response_status;
     r->response_bytes = response_bytes;
-    r->log_level = 100;  // 示例默认日志级别
+    r->log_level = 100;  // 默认日志级别
 }
 
 void parse_format(int opr) {
@@ -36,7 +34,6 @@ void parse_format(int opr) {
     while (*p && lf->count < MAX_TOKEN) {
         if (*p == '%') {
             p++;  // 跳过 '%'
-            // 这里只处理部分格式符，其他格式可以类似扩展
             if (*p == 'h') {
                 lf->type[lf->count] = ELEMENT_FORMAT;
                 lf->make_log[lf->count] = format_client_ip;
@@ -174,7 +171,6 @@ void write_log(Request* r, int opr) {
     }
 }
 
-/* 格式化函数实现 */
 
 void format_time(Request* r, char* buf, int bufsize) {
     time_t now = time(NULL);
@@ -237,7 +233,8 @@ void format_bytes(Request* r, char* buf, int bufsize) {
     snprintf(buf, bufsize, "%d", r->response_bytes);
 }
 
-/* 钩子注册和运行函数 */
+
+
 
 void hook_register(hook_function h) {
     if (hook_zzhi.count < MAX_TOKEN)

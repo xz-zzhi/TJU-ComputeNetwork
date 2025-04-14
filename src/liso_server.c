@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include <errno.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,6 +16,9 @@
 #include "response.h"
 
 #define ECHO_PORT 9999
+#define SEND_BUFFER_SIZE 4096 
+#define MAX_HEADER_SIZE 8192
+
 
 int sock=-1,client_sock=-1;
 char buf[BUF_SIZE];
@@ -40,6 +44,46 @@ void handle_sigpipe(const int sig)
     }
     exit(0);
 }
+
+int send_file(int client_sock, const char* filepath, Response* response) {
+    fprintf(stdout, "Opening file: %s\n", filepath);
+    
+    FILE* fp = fopen(filepath, "rb");
+    if(fp == NULL) {
+        fprintf(stderr, "Failed to open file: %s, errno: %d\n", filepath, errno);
+        return -1;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    rewind(fp);
+    
+    fprintf(stdout, "File size: %ld bytes\n", file_size);
+
+    char buffer[SEND_BUFFER_SIZE];
+    size_t total_sent = 0;
+    size_t bytes_read;
+    
+    while((bytes_read = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
+        size_t bytes_sent = 0;
+        while(bytes_sent < bytes_read) {
+            ssize_t ret = send(client_sock, buffer + bytes_sent, 
+                             bytes_read - bytes_sent, 0);
+            if(ret <= 0) {
+                fprintf(stderr, "Failed to send file data, errno: %d\n", errno);
+                fclose(fp);
+                return -1;
+            }
+            bytes_sent += ret;
+            total_sent += ret;
+        }
+    }
+    
+    fprintf(stdout, "Total bytes sent: %zu\n", total_sent);
+    fclose(fp);
+    return 0;
+}
+
 void echo_service(Request* requst,int sock,char* buf);
 int main(int argc,char* argv[]) {
     /* register signal handler */
@@ -106,19 +150,32 @@ int main(int argc,char* argv[]) {
             /* receive msg from client, and concatenate msg with "(echo back)" to send back */
             memset(buf,0,BUF_SIZE);
 
-            int readret=recv(client_sock,buf,BUF_SIZE,0);
+            int readret=recv(client_sock,buf,BUF_SIZE-1,0);
+            buf[BUF_SIZE]='\0';
             if(readret<=0)break;
             fprintf(stdout,"Received (total %d bytes):%s \n",readret,buf);
 
             Request* request=parse(buf,strlen(buf),client_sock);
 
             Response* response=make_response(request);
-            if(response->http_status_code!=200){
+
+            if(response==NULL) {
+                fprintf(stderr,"Failed to create response\n");
+                continue;
+            }
+
+            if(response->http_status_code!=200) {
                 strcat(response->http_msg,"\r\n");
             }
-            if(send(client_sock,response->http_msg,strlen(response->http_msg),0)<0){
-                fprintf(stderr,"can't send???\n");
 
+            if(send(client_sock,response->http_msg,strlen(response->http_msg),0)<0) {
+                fprintf(stderr,"Failed to send HTTP headers\n");
+            }
+
+            if(response->method==GET&&response->http_status_code==200) {
+                if(send_file(client_sock,response->path,response)<0) {
+                    fprintf(stderr,"Failed to send file: %s\n",response->path);
+                }
             }
 
             free_Response(response);
@@ -135,6 +192,8 @@ int main(int argc,char* argv[]) {
         }
         fprintf(stdout,"Closed connection from %s:%d\n",inet_ntoa(cli_addr.sin_addr),ntohs(cli_addr.sin_port));
     }
+
+    /* close the socket */
     close_socket(sock);
     return EXIT_SUCCESS;
 }
