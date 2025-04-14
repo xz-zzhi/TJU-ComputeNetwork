@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "netdb.h": "c",
+        "parse.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c"
+    }
+}
