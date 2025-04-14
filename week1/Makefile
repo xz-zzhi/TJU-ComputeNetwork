@@ -3,9 +3,9 @@ OBJ_DIR := obj
 # all src files
 SRC := $(wildcard $(SRC_DIR)/*.c)
 # all objects
-OBJ := $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/example.o $(OBJ_DIR)/response.o $(OBJ_DIR)/http_data.o
+OBJ := $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/example.o $(OBJ_DIR)/response.o
 # all binaries
-BIN := example liso_server liso_client
+BIN := example liso_server liso_client echo_server
 # C compiler
 CC  := gcc
 # C PreProcessor Flag
@@ -15,7 +15,7 @@ CFLAGS   := -g -Wall
 # DEPS = parse.h y.tab.h
 
 default: all
-all : example liso_server liso_client
+all : example liso_server liso_client echo_server
 
 example: $(OBJ)
 	$(CC) $^ -o $@
@@ -31,12 +31,14 @@ $(SRC_DIR)/y.tab.c: $(SRC_DIR)/parser.y
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(OBJ_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-liso_server: $(OBJ_DIR)/liso_server.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/response.o $(OBJ_DIR)/http_data.o
+liso_server: $(OBJ_DIR)/liso_server.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/response.o
 	$(CC) -Werror $^ -o $@
 
 liso_client: $(OBJ_DIR)/liso_client.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o 
 	$(CC) -Werror $^ -o $@
 
+echo_server: $(OBJ_DIR)/echo_server.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o 
+	$(CC) -Werror $^ -o $@
 
 $(OBJ_DIR):
 	mkdir $@

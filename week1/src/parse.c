@@ -51,7 +51,6 @@ Request *parse(const char *buffer, const int size, int socketFd) {
     //Valid End State
     if (state == STATE_CRLFCRLF) {
         Request *request = malloc(sizeof(Request));
-        request->socket_buf=buffer;
         request->header_count = 0;
         request->headers = (Request_header *) malloc(sizeof(Request_header) * 1);//start from 0, have a empty space
         set_parsing_options(parse_buf, i, request);

@@ -3,6 +3,9 @@
         "netdb.h": "c",
         "parse.h": "c",
         "string.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "fcntl.h": "c",
+        "libgen.h": "c",
+        "response.h": "c"
     }
 }
