@@ -57,10 +57,11 @@ Request *parse(const char *buffer, const int size, int socketFd) {
         set_parsing_options(parse_buf, i, request);
 
         if (yyparse() == SUCCESS) {
+            yylex_destroy();
             return request;
         }
     }
-
+    yylex_destroy();
     return NULL;
 }
 
