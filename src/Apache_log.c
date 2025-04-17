@@ -130,10 +130,7 @@ void parse_format(int opr) {
     }
 }
 
-void write_log(Request* r,int opr) {
-    if(r==NULL) {
-        return;
-    }
+void write_log(Request* r,Response* ret,int opr) {
     Log_Format* lf=&log_fromat[opr];
 
     char log_entry[LOG_BUFFER_SIZE]={0};
@@ -145,7 +142,7 @@ void write_log(Request* r,int opr) {
         }
         else if(lf->type[i]==ELEMENT_FORMAT&&lf->make_log[i]!=NULL) {
             memset(temp,0,sizeof(temp));
-            lf->make_log[i](r,temp,sizeof(temp));
+            lf->make_log[i](r,ret,temp,sizeof(temp));
             strncat(log_entry,temp,sizeof(log_entry)-strlen(log_entry)-1);
         }
     }
@@ -172,7 +169,7 @@ void write_log(Request* r,int opr) {
 }
 
 
-void format_time(Request* r,char* buf,int bufsize) {
+void format_time(Request* r,Response* ret, char* buf,int bufsize) {
     time_t now=time(NULL);
     struct tm* local=localtime(&now);
     snprintf(buf,bufsize,"%04d-%02d-%02d %02d:%02d:%02d",
@@ -180,57 +177,58 @@ void format_time(Request* r,char* buf,int bufsize) {
         local->tm_hour,local->tm_min,local->tm_sec);
 }
 
-void format_log_level(Request* r,char* buf,int bufsize) {
+void format_log_level(Request* r,Response* ret, char* buf,int bufsize) {
     const char* level="info";
-    if(r->log_level==0)
+    if(ret->log_level==0)
         level="error";
-    else if(r->log_level==1)
+    else if(ret->log_level==1)
         level="warn";
     snprintf(buf,bufsize,"%s",level);
 }
 
-void format_pid(Request* r,char* buf,int bufsize) {
+void format_pid(Request* r,Response* ret, char* buf,int bufsize) {
     snprintf(buf,bufsize,"%d",getpid());
 }
 
-void format_file(Request* r,char* buf,int bufsize) {
+void format_file(Request* r,Response* ret, char* buf,int bufsize) {
     snprintf(buf,bufsize,"%s",__FILE__);
 }
 
-void format_error(Request* r,char* buf,int bufsize) {
-    if(r->error_message)
-        snprintf(buf,bufsize,"%s",r->error_message);
+void format_error(Request* r,Response* ret, char* buf,int bufsize) {
+    if(ret->http_status_msg)
+        snprintf(buf,bufsize,"%s",ret->http_status_msg);
     else
         snprintf(buf,bufsize,"None");
 }
 
-void format_client_ip(Request* r,char* buf,int bufsize) {
-    if(r->client_ip)
-        snprintf(buf,bufsize,"%s",r->client_ip);
+void format_client_ip(Request* r,Response* ret, char* buf,int bufsize) {
+    if(ret->client_ip)
+        snprintf(buf,bufsize,"%s",ret->client_ip);
     else
         snprintf(buf,bufsize,"unknown");
 }
 
-void format_message(Request* r,char* buf,int bufsize) {
-    if(r->error_message)
-        snprintf(buf,bufsize,"%s",r->error_message);
+/////?????????????????????
+void format_message(Request* r,Response* ret, char* buf,int bufsize) {
+    if(ret->http_status_msg)
+        snprintf(buf,bufsize,"%s",ret->http_status_msg);
     else
         snprintf(buf,bufsize,"No message");
 }
 
-void format_request_line(Request* r,char* buf,int bufsize) {
+void format_request_line(Request* r,Response* ret, char* buf,int bufsize) {
     if(r->http_method)
         snprintf(buf,bufsize,"%s %s %s",r->http_method,r->http_uri,r->http_version);
     else
-        snprintf(buf,bufsize,"GET /");
+        snprintf(buf,bufsize,"format_error");
 }
 
-void format_status(Request* r,char* buf,int bufsize) {
-    snprintf(buf,bufsize,"%d",r->response_status);
+void format_status(Request* r,Response* ret, char* buf,int bufsize) {
+    snprintf(buf,bufsize,"%d",ret->http_status_code);
 }
 
-void format_bytes(Request* r,char* buf,int bufsize) {
-    snprintf(buf,bufsize,"%d",r->response_bytes);
+void format_bytes(Request* r,Response* ret, char* buf,int bufsize) {
+    snprintf(buf,bufsize,"%d",ret->msg_bytes);
 }
 
 

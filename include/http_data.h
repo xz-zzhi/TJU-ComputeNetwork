@@ -3,6 +3,10 @@
 
 
 #define BUF_SIZE 9999
+#define MAX_RESPONSE_HEADER 30
+#define HTTP_MSG_SIZE 8192
+#define PATH_SIZE 1024
+#define HTTP_VERSION_SIZE 16
 
 // typedef 定义类型
 typedef struct {
@@ -24,9 +28,29 @@ typedef struct {
     int log_level;
     char* socket_buf;
 } Request;
+typedef struct 
+{
+	char header_value[4096];
+}Response_headers;
 
+
+typedef struct{
+    char* http_status_msg;
+    int http_status_code_name;
+    int http_status_code;
+    int content_bytes;
+    int msg_bytes;
+    char client_ip[100];
+    char type;
+    int method;
+    int log_level;
+    char http_msg[HTTP_MSG_SIZE];
+    char path[PATH_SIZE];
+    char http_version[HTTP_VERSION_SIZE];
+}Response;
 
 enum { code400, code404, code501, code200, code505 };
+
 enum { GET=2, POST, HEAD, UKNOWN, ERROR };
 
 // 如果有全局数据需要共享，使用 extern 声明

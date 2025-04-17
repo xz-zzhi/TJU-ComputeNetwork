@@ -18,6 +18,7 @@
 #define ECHO_PORT 9999
 #define SEND_BUFFER_SIZE 4096 
 #define MAX_HEADER_SIZE 8192
+#define LimitRequestLine 8192
 
 
 int sock=-1,client_sock=-1;
@@ -45,49 +46,18 @@ void handle_sigpipe(const int sig)
     exit(0);
 }
 
-int send_file(int client_sock, const char* filepath, Response* response) {
-    fprintf(stdout, "Opening file: %s\n", filepath);
-    
-    FILE* fp = fopen(filepath, "rb");
-    if(fp == NULL) {
-        fprintf(stderr, "Failed to open file: %s, errno: %d\n", filepath, errno);
-        return -1;
-    }
+int read_request_header(int sock,char* header_buf);
 
-    fseek(fp, 0, SEEK_END);
-    long file_size = ftell(fp);
-    rewind(fp);
-    
-    fprintf(stdout, "File size: %ld bytes\n", file_size);
-
-    char buffer[SEND_BUFFER_SIZE];
-    size_t total_sent = 0;
-    size_t bytes_read;
-    
-    while((bytes_read = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
-        size_t bytes_sent = 0;
-        while(bytes_sent < bytes_read) {
-            ssize_t ret = send(client_sock, buffer + bytes_sent, 
-                             bytes_read - bytes_sent, 0);
-            if(ret <= 0) {
-                fprintf(stderr, "Failed to send file data, errno: %d\n", errno);
-                fclose(fp);
-                return -1;
-            }
-            bytes_sent += ret;
-            total_sent += ret;
-        }
-    }
-    
-    fprintf(stdout, "Total bytes sent: %zu\n", total_sent);
-    fclose(fp);
-    return 0;
-}
+int send_file(int client_sock,const char* filepath,Response* response);
 
 void echo_service(Request* requst,int sock,char* buf);
 int main(int argc,char* argv[]) {
     /* register signal handler */
     /* process termination signals */
+
+    parse_format(access_log);
+    parse_format(error_log);
+
     signal(SIGTERM,handle_signal);
     signal(SIGINT,handle_signal);
     signal(SIGSEGV,handle_signal);
@@ -149,24 +119,32 @@ int main(int argc,char* argv[]) {
         while(1){
             /* receive msg from client, and concatenate msg with "(echo back)" to send back */
             memset(buf,0,BUF_SIZE);
+            /*--------------------old receive----------------*/
+            // int readret=recv(client_sock,buf,BUF_SIZE-1,0);
+            // buf[BUF_SIZE]='\0';
+            /*--------------------old receive----------------*/
 
-            int readret=recv(client_sock,buf,BUF_SIZE-1,0);
-            buf[BUF_SIZE]='\0';
+            /*--------------------new receive----------------*/
+            int readret=read_request_header(client_sock,buf);
+            buf[readret]='\0';
+            /*--------------------new receive----------------*/
+
             if(readret<=0)break;
+
             fprintf(stdout,"Received (total %d bytes):%s \n",readret,buf);
 
             Request* request=parse(buf,strlen(buf),client_sock);
 
-            Response* response=make_response(request);
+            Response* response=make_response(request,inet_ntoa(cli_addr.sin_addr));
 
             if(response==NULL) {
                 fprintf(stderr,"Failed to create response\n");
                 continue;
             }
 
-            if(response->http_status_code!=200) {
-                strcat(response->http_msg,"\r\n");
-            }
+            // if(response->http_status_code!=200) {
+            //     strcat(response->http_msg,"\r\n");
+            // }
 
             if(send(client_sock,response->http_msg,strlen(response->http_msg),0)<0) {
                 fprintf(stderr,"Failed to send HTTP headers\n");
@@ -177,6 +155,10 @@ int main(int argc,char* argv[]) {
                     fprintf(stderr,"Failed to send file: %s\n",response->path);
                 }
             }
+            if(response->http_status_code==200)
+                write_log(request,response,access_log);
+            else
+                write_log(request,response,error_log);
 
             free_Response(response);
 
@@ -205,4 +187,74 @@ void echo_service(Request* rq,int sock,char* buf){
     else{
         send(client_sock,error_msg[code501],strlen(error_msg[code501]),0);
     }
+}
+
+int send_file(int client_sock,const char* filepath,Response* response) {
+    fprintf(stdout,"Opening file: %s\n",filepath);
+
+    FILE* fp=fopen(filepath,"rb");
+    if(fp==NULL) {
+        fprintf(stderr,"Failed to open file: %s, errno: %d\n",filepath,errno);
+        return -1;
+    }
+
+    fseek(fp,0,SEEK_END);
+    long file_size=ftell(fp);
+    rewind(fp);
+
+    fprintf(stdout,"File size: %ld bytes\n",file_size);
+
+    char buffer[SEND_BUFFER_SIZE];
+    size_t total_sent=0;
+    size_t bytes_read;
+
+    while((bytes_read=fread(buffer,1,sizeof(buffer),fp))>0) {
+        size_t bytes_sent=0;
+        while(bytes_sent<bytes_read) {
+            ssize_t ret=send(client_sock,buffer+bytes_sent,
+                bytes_read-bytes_sent,0);
+            if(ret<=0) {
+                fprintf(stderr,"Failed to send file data, errno: %d\n",errno);
+                fclose(fp);
+                return -1;
+            }
+            bytes_sent+=ret;
+            total_sent+=ret;
+        }
+    }
+
+    fprintf(stdout,"Total bytes sent: %zu\n",total_sent);
+    fclose(fp);
+    return 0;
+}
+
+int read_request_header(int sock,char* header_buf) {
+    int total_read=0;
+    int bytes_read;
+    while(1) {
+        bytes_read=recv(sock,header_buf+total_read,1024,0); // 每次读取 1024 字节
+        if(bytes_read<0) {
+            perror("recv error");
+            return -1;
+        }
+        if(bytes_read==0) {
+            // 客户端关闭连接
+            break;
+        }
+        total_read+=bytes_read;
+        header_buf[total_read]='\0';  // 保证字符串结尾
+
+        // 判断是否超过 header 限制（注意加上结束符号所占空间）
+        if(total_read>MAX_HEADER_SIZE) {
+            // 超过头部长度限制，返回错误
+            fprintf(stderr,"Request header too large: %d bytes\n",total_read);
+            return -1;
+        }
+
+        // 检查是否完整收到 header（以 "\r\n\r\n" 结束）
+        if(strstr(header_buf,"\r\n\r\n")!=NULL) {
+            break;
+        }
+    }
+    return total_read;
 }

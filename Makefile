@@ -3,7 +3,7 @@ OBJ_DIR := obj
 # all src files
 SRC := $(wildcard $(SRC_DIR)/*.c)
 # all objects
-OBJ := $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/example.o $(OBJ_DIR)/response.o $(OBJ_DIR)/http_data.o
+OBJ := $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/example.o $(OBJ_DIR)/response.o $(OBJ_DIR)/Apache_log.o $(OBJ_DIR)/http_data.o
 # all binaries
 BIN := example liso_server liso_client
 # C compiler
@@ -31,7 +31,7 @@ $(SRC_DIR)/y.tab.c: $(SRC_DIR)/parser.y
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(OBJ_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-liso_server: $(OBJ_DIR)/liso_server.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/response.o $(OBJ_DIR)/http_data.o
+liso_server: $(OBJ_DIR)/liso_server.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o $(OBJ_DIR)/response.o $(OBJ_DIR)/http_data.o $(OBJ_DIR)/Apache_log.o
 	$(CC) -Werror $^ -o $@
 
 liso_client: $(OBJ_DIR)/liso_client.o $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/lex.yy.o $(OBJ_DIR)/parse.o 

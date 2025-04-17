@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include "parse.h"
 #include "http_data.h"
+
 #define MAX_TOKEN 50
 #define LOG_BUFFER_SIZE 4900
 
@@ -29,7 +30,7 @@
 // } Request;
 
 typedef void (*hook_function)(Request* r);
-typedef void (*solve_log_msg)(Request* r, char* buf, int bufsize);
+typedef void (*solve_log_msg)(Request* r, Response* ret, char* buf, int bufsize);
 
 /* 枚举定义 */
 enum Element_type { ELEMENT_TEXT, ELEMENT_FORMAT };
@@ -56,20 +57,20 @@ extern Log_Format log_fromat[5];
 
 /* 日志相关函数原型 */
 extern void parse_format(int opr);
-extern void write_log(Request* r, int opr);
+extern void write_log(Request* r,Response* ret,int opr);
 extern void get_other_msg(Request *r, int response_status, int response_bytes, char *error_message, char* client_ip);
  
 /* 各种格式化日志元素的函数原型 */
-extern void format_time(Request* r, char* buf, int bufsize);
-extern void format_log_level(Request* r, char* buf, int bufsize);
-extern void format_pid(Request* r, char* buf, int bufsize);
-extern void format_file(Request* r, char* buf, int bufsize);
-extern void format_error(Request* r, char* buf, int bufsize);
-extern void format_client_ip(Request* r, char* buf, int bufsize);
-extern void format_message(Request* r, char* buf, int bufsize);
-extern void format_request_line(Request* r, char* buf, int bufsize);
-extern void format_status(Request* r, char* buf, int bufsize);
-extern void format_bytes(Request* r, char* buf, int bufsize);
+extern void format_time(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_log_level(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_pid(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_file(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_error(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_client_ip(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_message(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_request_line(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_status(Request* r, Response* ret, char* buf, int bufsize);
+extern void format_bytes(Request* r, Response* ret, char* buf, int bufsize);
 
 /* 钩子函数相关 */
 typedef struct {

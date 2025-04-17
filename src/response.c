@@ -35,6 +35,7 @@ int implementUKOWN(Response* r,Request* request){
 int implementPOST(Response* r,Request* request)
 {
     strcpy(r->http_msg,request->socket_buf);
+    fprintf(stderr,"?\n");
     return 1;
 }
 
@@ -83,7 +84,7 @@ int implementHEAD(Response* r,Request* request)
         return 1;
     }
     r->type=(S_ISCHR(buf.st_mode))?'r':'b';
-    r->response_bytes=buf.st_size;
+    r->content_bytes=buf.st_size;
     r->http_status_code=200;
     r->http_status_code_name=code200;
     r->http_status_msg=error_msg[code200];
@@ -145,9 +146,12 @@ int implementGET(Response* r,Request* request)
     return 1;
 }
 
-Response* make_response(Request* request){
+Response* make_response(Request* request,char addr[]){
     Response* r=(Response*)malloc(sizeof(Response));
     // r->http_msg=NULL;
+    strcpy(r->client_ip,addr);
+    r->content_bytes=0;
+    r->log_level=100;
     if(r==NULL) {
         return NULL;
     }
@@ -193,6 +197,11 @@ Response* make_response(Request* request){
         implementUKOWN(r,request);
         break;
     }
+    fprintf(stderr,"???\n");
+
+    r->msg_bytes=strlen(r->http_msg)+(r->content_bytes);
+    fprintf(stderr,"???\n");
+    
     return r;
 }
 
