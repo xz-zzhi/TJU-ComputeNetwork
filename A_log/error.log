@@ -58,3 +58,8 @@
 : [client ] HTTP/1.1 400 Bad request
 
 
+[2025-04-17 22:02:40] [info] [pid 3350] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+

@@ -16,4 +16,4 @@ char* error_msg[]={
     [code505] "HTTP/1.1 505 HTTP Version not supported\r\n\r\n"
 };
 
-char *defaut_address=".";
+char *defaut_address="./static_site";
