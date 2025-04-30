@@ -1,27 +1,27 @@
-# project-1
+# 项目来源: TJU 2025年 计算机网络课程实验
 
-This repository contains the starter code for ***CMU 15-441/641 Networking and the Internet Project 1: A Web Server Called Liso***.
+项目允许组队完成，此处分离出自己的贡献部分代码，原作业库为：
 
-## 1. Files
-- `DockerFile`: Script to build the docker image for the project's environment.
-- `Makefile`: Contains rules for `make`.
-- `README.md`: Current document.
-- `cp1`: CP1 scripts and examples.
-- `cp2`: CP2 scripts and examples.
-- `cp3`: CP3 scripts and examples.
-- `src/`: Source code for the project.
-    - `src/echo_client.c`: Simple echo network client.
-    - `src/echo_server.c`: Simple echo network server
-    - `src/example.c`: Example driver for parsing.
-    - `src/lexer.l`: Lex/Yacc related logic.
-    - `src/parser.y`
-    - `src/parse.c`
-- `include/parse.h`
+因为其中绝大部分代码和设计都是自己独立贡献的，所以专门分离出一个自己维护的库。基本上和作业库没有区别。（因为代码基本上都是自己贡献的）
 
-## 2. Environment Setup
-1. Install docker: https://www.docker.com
-2. Open a terminal and navigate to the directory containing this `README.md` file.
-3. Build the docker image: `docker build -t 15-441/641-project-1:latest -f ./DockerFile .`
-4. Run the docker container: ``docker run -it -v `pwd`:/home/project-1/ --name <name for your container> 15-441/641-project-1 /bin/bash``
-5. The starter code for the project is available at `/home/project-1/` in the container and `.` on your local machine. To make development easier, a mapping is established between these two folders. Modiying the code in one location will also effect the other one. This means that you can use an IDE to write code on your local machine and then seamlessly test it in the container.
-6. To test your server using a web browser, you need to configure port mapping for the docker container. Simply add the argument `-p 8888:15441` to the `docker run` command to establish a mapping from `127.0.0.1:15441` in the container to `127.0.0.1:8888` on your local machine. Then you can test your server by using a web browser (e.g., Chrome) on your local machine to navigate to the URL `127.0.0.1:8888`.
+抄作业的同学请给一个 star 感谢
+
+## 项目结构
+
+其中为方便学习(抄作业)
+
+我分离出了各个阶段所对应的作业代码，其中包含每个阶段存在改动的代码
+
+个人感悟：我是菜鸟，算是菜鸟给菜鸟的感悟，相比于此前的课程实验作业，服务器的作业是非常好写的，因为完成基本服务器的功能不需要太多的理论知识，其实就是个人程序设计经验和代码能力的运用，非常建议有代码能力但是没有独立完成过课设的同学尝试，作为面对课程实验的新的开始
+
+## 其他
+
+关于Apache log的部分，是学习了Apache的设计，可能会不好读，但是作为作业来说完全可以不写成这样，可以重新写一个简单的，如果是写简单的log可能就只有几十行的代码量
+
+关于Apache log的设计概要如下：
+提取用户对log的配置文件 -> 解析配置文件 -> 依据解析为对应的log处理数据结构体注册处理函数 -> 根据请求和返回数据包构建log信息 -> 写入日志文件
+
+如果有需要交流的地方可能可以发邮件联系，或许会看（
+
+Email: 425886204@qq.com
+

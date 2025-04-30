@@ -321,7 +321,7 @@ int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,in
     int bytes_read=0;
     struct timeval recv_timeout;
     while(1) {
-        recv_timeout.tv_sec=0;
+        recv_timeout.tv_sec=0;   // 可以尝试调成 1 秒，来更方便的查看自己设置的调试信息
         recv_timeout.tv_usec=100;
         if(setsockopt(sock,SOL_SOCKET,SO_RCVTIMEO,&recv_timeout,sizeof(recv_timeout))<0) {
             perror("setsockopt SO_RCVTIMEO failed");
