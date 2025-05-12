@@ -208,3 +208,18 @@
 : [client ] HTTP/1.1 400 Bad request
 
 
+[2025-05-12 15:36:01] [info] [pid 25744] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+
+: [client ] HTTP/1.1 501 Not Implemented
+
+
+[2025-05-12 15:38:16] [info] [pid 26528] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+
+: [client ] HTTP/1.1 501 Not Implemented
+
+
+[2025-05-12 15:38:16] [info] [pid 26528] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+
+: [client ] HTTP/1.1 501 Not Implemented
+
+

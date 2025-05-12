@@ -20,16 +20,19 @@
 #include "response.h"
 
 #define ECHO_PORT 9999
-#define SEND_BUFFER_SIZE 4096 
+#define SEND_BUFFER_SIZE 4096
 #define MAX_HEADER_SIZE 8192
 #define LimitRequestLine 8192
 
 
 int sock=-1,old_client_sock=-1;
-char buf[BUF_SIZE];
+char buf[FD_SETSIZE+5][BUF_SIZE];
+int count_Time[FD_SETSIZE+5];
 int vis_sock[FD_SETSIZE+5];
+int sock_now_read[FD_SETSIZE+5];
 int count_sock=0;
 int all_sock[FD_SETSIZE+5];
+int TIME=3;
 
 int close_socket(int sock) {
     if(close(sock)) {
@@ -53,7 +56,7 @@ void handle_sigpipe(const int sig)
     exit(0);
 }
 
-int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,int client_sock);
+int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,int client_sock,int toal_read);
 
 int send_file(int client_sock,const char* filepath,Response* response);
 
@@ -125,9 +128,8 @@ int main(int argc,char* argv[]) {
     FD_SET(sock,&read_fds);
     all_cli_addr[sock]=addr;
     // all_sock[++count_sock]=sock;
-
+    count_sock=1;
     int ccnt=1;
-    int TIME=10;
     int ii;
     for(ii=0;ii<=FD_SETSIZE+1;++ii){
         vis_sock[ii]=-1;
@@ -145,7 +147,6 @@ int main(int argc,char* argv[]) {
             }
             FD_SET(vis_sock[i],&read_fds);
         }
-        // FD_SET(sock,&read_fds);
         int status=select(FD_SETSIZE+1,&read_fds,NULL,NULL,&timeout);
         fprintf(stderr,"==== %d ===%d \n",status,ccnt++);
 
@@ -156,23 +157,67 @@ int main(int argc,char* argv[]) {
         }
         if(status==0) {
             fprintf(stderr,"Timeout in select.\n");
+            for(i=0;i<=FD_SETSIZE;++i){
+                if(vis_sock[i]==-1||i==sock){
+                    continue;
+                }
+                int now_sock=vis_sock[i];
+                count_Time[now_sock]++;
+                printf("count_Time[%d] = %d\n",now_sock,count_Time[now_sock]);
+                if(count_Time[now_sock]>TIME){
+                    if(close_socket(now_sock)){
+                        close_socket(sock);
+                        fprintf(stderr,"Error closing client socket.\n");
+                        return EXIT_FAILURE;
+                    }
+                    fprintf(stdout,"Closed connection from %s:%d\n",inet_ntoa(all_cli_addr[now_sock].sin_addr),ntohs(all_cli_addr[now_sock].sin_port));
+                    count_sock--;
+                    FD_CLR(now_sock,&read_fds);
+                    vis_sock[now_sock]=-1;
+                    sock_now_read[now_sock]=0;
+                    count_Time[now_sock]=0;
+                }
+            }
             continue;
         }
         // int i;
+        // sleep(1);
         for(i=0;i<=FD_SETSIZE;++i){
             if(vis_sock[i]==-1){
                 continue;
             }
-            fprintf(stderr,"neeeeeeeeeeee.\n");
+            // fprintf(stderr,"neeeeeeeeeeee.\n");
 
             int now_sock=vis_sock[i];
             if(!FD_ISSET(now_sock,&read_fds)){
+                count_Time[now_sock]++;
+                printf("count_Time[%d] = %d\n",now_sock,count_Time[now_sock]);
+                if(count_Time[now_sock]>TIME){
+                    if(close_socket(now_sock)){
+                        close_socket(sock);
+                        fprintf(stderr,"Error closing client socket.\n");
+                        return EXIT_FAILURE;
+                    }
+                    fprintf(stdout,"Closed connection from %s:%d\n",inet_ntoa(all_cli_addr[now_sock].sin_addr),ntohs(all_cli_addr[now_sock].sin_port));
+                    /*-----------------close----------------*/
+                    count_sock--;
+                    FD_CLR(now_sock,&read_fds);
+                    vis_sock[now_sock]=-1;
+                    sock_now_read[now_sock]=0;
+                    count_Time[now_sock]=0;
+                }
                 continue;
             }
+            // fprintf(stderr,"n1.\n");
+
             if(now_sock==sock){
                 // fprintf(stderr,"neeeeeeeeeeee.\n");
-
+                // fprintf(stderr,"n2.\n");
                 cli_size=sizeof(cli_addr);
+                if(count_sock>1000){
+                    fprintf(stderr,"Too many connections.\n");
+                    continue;
+                }
                 int new_client=accept(sock,(struct sockaddr*)&cli_addr,&cli_size);
                 if(new_client==-1){
                     fprintf(stderr,"Error accepting connection.\n");
@@ -183,28 +228,40 @@ int main(int argc,char* argv[]) {
                 all_cli_addr[new_client]=cli_addr;
                 FD_SET(new_client,&read_fds);
                 vis_sock[new_client]=new_client;
+                memset(&buf[now_sock][0],0,BUF_SIZE);
+                count_sock++;
+                // fprintf(stderr,"n2end.\n");
+
                 // FD_SET(new_client,&write_fds);//write 判段 是否断开连接
             }
             else{
-                fprintf(stdout,"now is %s:%d\n+++++",inet_ntoa(all_cli_addr[now_sock].sin_addr),ntohs(all_cli_addr[now_sock].sin_port));
 
-                memset(buf,0,BUF_SIZE);
-                read_request_header(now_sock,buf,all_cli_addr[now_sock],now_sock);
+                fprintf(stdout,"now is %s:%d\n",inet_ntoa(all_cli_addr[now_sock].sin_addr),ntohs(all_cli_addr[now_sock].sin_port));
+
+                int status=read_request_header(now_sock,&buf[now_sock][0],all_cli_addr[now_sock],now_sock,sock_now_read[now_sock]);
                 fprintf(stdout,"\n\n---------send back all-------\n");
                 /*-----------------close----------------*/
                 /* client closes the connection. server free resources and listen again */
-                if(close_socket(now_sock))
-                {
-                    close_socket(sock);
-                    fprintf(stderr,"Error closing client socket.\n");
-                    return EXIT_FAILURE;
+                if(status==-1){
+                    if(close_socket(now_sock)){
+                        close_socket(sock);
+                        fprintf(stderr,"Error closing client socket.\n");
+                        return EXIT_FAILURE;
+                    }
+                    fprintf(stdout,"Closed connection from %s:%d\n",inet_ntoa(all_cli_addr[now_sock].sin_addr),ntohs(all_cli_addr[now_sock].sin_port));
+                    /*-----------------close----------------*/
+                    count_sock--;
+                    FD_CLR(now_sock,&read_fds);
+                    vis_sock[now_sock]=-1;
+                    sock_now_read[now_sock]=0;
+                    count_Time[now_sock]=0;
                 }
-                fprintf(stdout,"Closed connection from %s:%d\n",inet_ntoa(all_cli_addr[now_sock].sin_addr),ntohs(all_cli_addr[now_sock].sin_port));
-                /*-----------------close----------------*/
-                FD_CLR(now_sock,&read_fds);
-                vis_sock[now_sock]=-1;
+
+                // fprintf(stderr,"status is %d\n",status);
+                sock_now_read[now_sock]=status;
             }
         }
+        FD_ZERO(&read_fds);
     }
     // while(1) {
     //     /* listen for new connection */
@@ -316,66 +373,66 @@ char* find_tail(char* buf,char** start,char* end){
     return NULL;
 }
 
-int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,int client_sock) {
-    int total_read=0;
+int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,int client_sock,int total_read) {
+    // int total_read=0;
     int bytes_read=0;
     struct timeval recv_timeout;
-    while(1) {
-        recv_timeout.tv_sec=0;
-        recv_timeout.tv_usec=100;
-        if(setsockopt(sock,SOL_SOCKET,SO_RCVTIMEO,&recv_timeout,sizeof(recv_timeout))<0) {
-            perror("setsockopt SO_RCVTIMEO failed");
-        }
-
-        int old_bufsize=bytes_read;
-        bytes_read=recv(sock,header_buf+total_read,1024,0); // 每次读取 1024 字节
-
-        if(bytes_read<0) {
-            perror("recv error");
-            return -1;
-        }
-        if(bytes_read==0) {            // 客户端关闭连接
-            break;
-        }
-        fprintf(stdout,"\n-----------\nReceived (total %d bytes):%s \n-----------\n",bytes_read,buf);
-
-        total_read+=bytes_read;
-
-        if(total_read) {
-            char* start=header_buf;
-            char* old_start=header_buf;
-            char* end;
-            while(find_tail(header_buf,&start,header_buf+total_read)!=NULL) {
-                int len=start-old_start;
-                Request* request=parse(old_start,len,client_sock);
-                Response* response=make_response(request,inet_ntoa(cli_addr.sin_addr));
-                solve(request,response,client_sock);
-                old_start=start;
-                fprintf(stdout,"\n---------send back-------\n");
-            }
-            if(old_start!=header_buf) {
-                int len=total_read-(old_start-header_buf);
-                char* buf_tem[BUF_SIZE];
-                memset(buf_tem,0,sizeof(buf_tem));
-                memcpy(buf_tem,old_start,len);
-                memset(header_buf,0,sizeof(header_buf));
-                strcpy(header_buf,buf_tem);
-                total_read=len;
-            }
-            else if(total_read>MAX_HEADER_SIZE){
-                total_read=0;
-                memset(header_buf,0,sizeof(header_buf));
-            }
-        }
-        else{
-            return;//实际上不会进入这一行
-        }
-
-        // // 检查是否完整收到 header（以 "\r\n\r\n" 结束）
-        // if(strstr(header_buf,"\r\n\r\n")!=NULL) {
-        //     break;
-        // }
+    // while(1) {
+    recv_timeout.tv_sec=0;
+    recv_timeout.tv_usec=100;
+    if(setsockopt(sock,SOL_SOCKET,SO_RCVTIMEO,&recv_timeout,sizeof(recv_timeout))<0) {
+        perror("setsockopt SO_RCVTIMEO failed");
     }
+
+    int old_bufsize=bytes_read;
+    bytes_read=recv(sock,header_buf+total_read,1024,0); // 每次读取 1024 字节
+
+    if(bytes_read<0) {
+        perror("recv error");
+        return -1;
+    }
+    if(bytes_read==0) {            // 客户端关闭连接
+        return -1;
+    }
+    fprintf(stdout,"\n-----------\nReceived (total %d bytes):%s \n-----------\n",bytes_read,buf);
+
+    total_read+=bytes_read;
+
+    if(total_read) {
+        char* start=header_buf;
+        char* old_start=header_buf;
+        char* end;
+        while(find_tail(header_buf,&start,header_buf+total_read)!=NULL) {
+            int len=start-old_start;
+            Request* request=parse(old_start,len,client_sock);
+            Response* response=make_response(request,inet_ntoa(cli_addr.sin_addr));
+            solve(request,response,client_sock);
+            old_start=start;
+            fprintf(stdout,"\n---------send back-------\n");
+        }
+        if(old_start!=header_buf) {
+            int len=total_read-(old_start-header_buf);
+            char* buf_tem[BUF_SIZE];
+            memset(buf_tem,0,sizeof(buf_tem));
+            memcpy(buf_tem,old_start,len);
+            memset(header_buf,0,sizeof(header_buf));
+            strcpy(header_buf,buf_tem);
+            total_read=len;
+        }
+        else if(total_read>MAX_HEADER_SIZE){
+            total_read=0;
+            memset(header_buf,0,sizeof(header_buf));
+        }
+    }
+    else{
+        return;//实际上不会进入这一行
+    }
+
+    // // 检查是否完整收到 header（以 "\r\n\r\n" 结束）
+    // if(strstr(header_buf,"\r\n\r\n")!=NULL) {
+    //     break;
+    // }
+// }
     return total_read;
 }
 
