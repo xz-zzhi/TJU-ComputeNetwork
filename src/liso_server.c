@@ -24,6 +24,7 @@
 #define MAX_HEADER_SIZE 8192
 #define LimitRequestLine 8192
 
+// #define DEBUG 1
 
 int sock=-1,old_client_sock=-1;
 char buf[FD_SETSIZE+5][BUF_SIZE];
@@ -66,7 +67,20 @@ char* find_tail(char* buf,char** start,char* end);
 
 void solve(Request* request,Response* response,int client_sock);
 
+// int invoke_cgi(const char *script_path, const Request *req, int client_sock);
+
+#ifdef DEBUG
+FILE* fp;
+#endif 
+
 int main(int argc,char* argv[]) {
+#ifdef DEBUG
+    fp=fopen("A_log/All_request.txt","w");
+    if(fp==NULL) {
+        perror("打开文件失败");
+        return 1;
+    }
+#endif 
     /* register signal handler */
     /* process termination signals */
 
@@ -139,6 +153,9 @@ int main(int argc,char* argv[]) {
     while(true){
         timeout.tv_sec=0;
         timeout.tv_usec=500;
+#ifdef DEBUG
+        timeout.tv_sec=2;
+#endif
         FD_ZERO(&read_fds);
         int i;
         for(i=0;i<=FD_SETSIZE;++i){
@@ -263,45 +280,6 @@ int main(int argc,char* argv[]) {
         }
         FD_ZERO(&read_fds);
     }
-    // while(1) {
-    //     /* listen for new connection */
-    //     cli_size=sizeof(cli_addr);
-    //     fprintf(stdout,"Waiting for connection...\n");
-
-    //     /*-----------get------------request*/
-    //     // client_sock=accept(sock,(struct sockaddr*)&cli_addr,&cli_size);
-    //     // if(client_sock==-1)
-    //     // {
-    //     //     fprintf(stderr,"Error accepting connection.\n");
-    //     //     close_socket(sock);
-    //     //     return EXIT_FAILURE;
-    //     // }
-    //     // fprintf(stdout,"New connection from %s:%d\n",inet_ntoa(cli_addr.sin_addr),ntohs(cli_addr.sin_port));
-    //     /*-----------get------------request*/
-
-
-
-    //     /*-----------solve()-----------*/
-    //     // memset(buf,0,BUF_SIZE);
-    //     // read_request_header(client_sock,buf,cli_addr);
-    //     /*-----------solve()-----------*/
-
-    //     fprintf(stdout,"\n\n---------send back all-------\n");
-
-
-    //     /*-----------------close----------------*/
-    //     /* client closes the connection. server free resources and listen again */
-    //     // if(close_socket(client_sock))
-    //     // {
-    //     //     close_socket(sock);
-    //     //     fprintf(stderr,"Error closing client socket.\n");
-    //     //     return EXIT_FAILURE;
-    //     // }
-    //     // fprintf(stdout,"Closed connection from %s:%d\n",inet_ntoa(cli_addr.sin_addr),ntohs(cli_addr.sin_port));
-    //     /*-----------------close----------------*/
-
-    // }
-
     /* close the socket */
     close_socket(sock);
     return EXIT_SUCCESS;
@@ -365,6 +343,10 @@ char* find_tail(char* buf,char** start,char* end){
             // fprintf(stderr,"************%d\n",(int)(end-(*start)));
             int len=(*start)-old;
             memcpy(buf_tem,old,len);
+
+#ifdef DEBUG
+            fprintf(fp,"%s",buf_tem);
+#endif
             fprintf(stdout,"\n++++++++++\nnow request: (total %d bytes):\n%s++++++++++\n",(int)(*start-old),buf_tem);
             return (*start);
         }
@@ -394,8 +376,9 @@ int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,in
     if(bytes_read==0) {            // 客户端关闭连接
         return -1;
     }
+#ifdef DEBUG
     fprintf(stdout,"\n-----------\nReceived (total %d bytes):%s \n-----------\n",bytes_read,buf);
-
+#endif
     total_read+=bytes_read;
 
     if(total_read) {
@@ -405,10 +388,20 @@ int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,in
         while(find_tail(header_buf,&start,header_buf+total_read)!=NULL) {
             int len=start-old_start;
             Request* request=parse(old_start,len,client_sock);
+            // fprintf(fp,"%s\n----\n",header_buf+total_read);
+// #ifdef DEBAG
+//             char a[2000]={0};
+//             strncpy(a,old_start,len);
+//             fprintf(fp,"%s\n----\n",a);
+// #endif
+
             Response* response=make_response(request,inet_ntoa(cli_addr.sin_addr));
             solve(request,response,client_sock);
             old_start=start;
+#ifdef DEBUG
             fprintf(stdout,"\n---------send back-------\n");
+#endif
+
         }
         if(old_start!=header_buf) {
             int len=total_read-(old_start-header_buf);
@@ -436,15 +429,58 @@ int read_request_header(int sock,char* header_buf,struct sockaddr_in cli_addr,in
     return total_read;
 }
 
+bool is_cgi_request(const char* uri) {
+    return strncmp(uri,"/CGI/",5)==0;
+}
+
+void split_uri(const char* uri,char* script_path,char* query) {
+    const char* question_mark=strchr(uri,'?');
+    if(question_mark!=NULL) {
+        size_t path_length=question_mark-uri;
+        strncpy(script_path,uri,path_length);
+        script_path[path_length]='\0';
+        strcpy(query,question_mark+1);
+    }
+    else {
+        strcpy(script_path,uri);
+        query[0]='\0';
+    }
+}
+
 void solve(Request* request,Response* response,int client_sock) {
     if(response==NULL) {
         fprintf(stderr,"Failed to create response\n");
         return;
     }
+    
+    if(is_cgi_request(request->http_uri)) {
+        // 比如：URI = "/cgi-bin/hello.py?name=Tom"
+        char script_path[512],query[512];
+        split_uri(request->http_uri,script_path,query);
 
-    // if(response->http_status_code!=200) {
-    //     strcat(response->http_msg,"\r\n");
-    // }
+        // 读取 POST body（如果需要），这里假设 parse() 已经把 body 放到 request->body
+        // char* body = NULL;
+        // if (strcmp(request->http_method, "POST") == 0) {
+        //     body = request->body;
+        // }
+#ifdef DEBUG
+        fprintf(stderr,"script_path: %s\n",script_path);
+        fprintf(stderr,"query: %s\n",query);
+        fprintf(stderr,"next is invoke_cgi\n");
+#endif
+        if (invoke_cgi(script_path, request, client_sock) < 0) {
+            // 若失败，可以返回 500 错误
+            const char *err = "HTTP/1.1 500 Internal Server Error\r\n"
+                              "Content-Length: 0\r\n\r\n";
+            send(client_sock, err, strlen(err), 0);
+        }
+        
+        free_Response(response);
+        return;
+    }
+    if(response->http_status_code!=200) {
+        strcat(response->http_msg,"\r\n");
+    }
 
     if(send(client_sock,response->http_msg,strlen(response->http_msg),0)<0) {
         fprintf(stderr,"Failed to send HTTP headers\n");

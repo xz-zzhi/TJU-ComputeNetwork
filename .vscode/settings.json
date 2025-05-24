@@ -6,6 +6,9 @@
         "stdlib.h": "c",
         "fcntl.h": "c",
         "libgen.h": "c",
-        "response.h": "c"
+        "response.h": "c",
+        "apache_log.h": "c",
+        "http_data.h": "c",
+        "socket.h": "c"
     }
 }

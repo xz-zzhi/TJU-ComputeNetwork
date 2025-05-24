@@ -1,12 +1,17 @@
 #ifndef MYDATA_H    // 预防重复包含
 #define MYDATA_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #define BUF_SIZE 9999
 #define MAX_RESPONSE_HEADER 30
 #define HTTP_MSG_SIZE 8192
 #define PATH_SIZE 1024
 #define HTTP_VERSION_SIZE 16
+#define MAX_ENV_VARS 128
 
 // typedef 定义类型
 typedef struct {
@@ -24,10 +29,11 @@ typedef struct {
     int response_status;
     int response_bytes;
     char *error_message;
-    char* client_ip;
+    char client_ip[100];
     int log_level;
     char* socket_buf;
 } Request;
+
 typedef struct 
 {
 	char header_value[4096];

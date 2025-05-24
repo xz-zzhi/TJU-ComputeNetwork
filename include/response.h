@@ -25,3 +25,7 @@ extern int implementPOST(Response* r,Request* request);
 extern int implementHEAD(Response* r,Request* request);
 extern int implementGET(Response* r,Request* request);
 extern int implementUKOWN(Response* r,Request* request);
+static char** build_cgi_envp(const Request* req);
+static void free_envp(char** envp);
+extern int handle_cgi(int client_sock, char *script_path, char *query, Request* request);
+extern int invoke_cgi(const char *script_path, const Request *req, int client_sock);

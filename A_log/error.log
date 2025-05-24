@@ -1,224 +1,74 @@
-[2025-04-29 12:44:19] [info] [pid 19255] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 13:26:37] [info] [pid 9160] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 13:26:56] [info] [pid 9160] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 13:28:13] [info] [pid 9787] src/Apache_log.c: HTTP/1.1 501 Not Implemented
 
 : [client ] HTTP/1.1 501 Not Implemented
 
 
-[2025-04-29 12:45:39] [info] [pid 19255] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 13:53:31] [info] [pid 16431] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 18:42:47] [info] [pid 2406] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 18:53:06] [info] [pid 5953] src/Apache_log.c: HTTP/1.1 501 Not Implemented
 
 : [client ] HTTP/1.1 501 Not Implemented
 
 
-[2025-04-29 12:45:41] [info] [pid 19255] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 18:53:13] [info] [pid 5953] src/Apache_log.c: HTTP/1.1 501 Not Implemented
 
 : [client ] HTTP/1.1 501 Not Implemented
 
 
-[2025-04-29 12:55:41] [info] [pid 21330] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 19:55:33] [info] [pid 47198] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 19:58:24] [info] [pid 48249] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 20:00:08] [info] [pid 48838] src/Apache_log.c: HTTP/1.1 501 Not Implemented
 
 : [client ] HTTP/1.1 501 Not Implemented
 
 
-[2025-04-29 12:55:55] [info] [pid 21330] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 21:36:31] [info] [pid 2526] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 21:36:33] [info] [pid 2526] src/Apache_log.c: HTTP/1.1 404 Not Found
+
+: [client ] HTTP/1.1 404 Not Found
+
+
+[2025-05-24 21:36:44] [info] [pid 2526] src/Apache_log.c: HTTP/1.1 501 Not Implemented
 
 : [client ] HTTP/1.1 501 Not Implemented
 
 
-[2025-04-29 12:56:17] [info] [pid 21589] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 21:36:44] [info] [pid 2526] src/Apache_log.c: HTTP/1.1 404 Not Found
 
-: [client ] HTTP/1.1 501 Not Implemented
+: [client ] HTTP/1.1 404 Not Found
 
 
-[2025-04-29 12:56:40] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:41] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:41] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:42] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:43] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:44] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:51] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:51] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 12:56:51] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 12:56:51] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:51] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 12:56:51] [info] [pid 21784] src/Apache_log.c: HTTP/1.1 400 Bad request
-
-: [client ] HTTP/1.1 400 Bad request
-
-
-[2025-04-29 14:56:39] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:39] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:39] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:39] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:39] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:39] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 400 Bad request
-
-: [client ] HTTP/1.1 400 Bad request
-
-
-[2025-04-29 14:56:40] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:40] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:40] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:40] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:40] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:40] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 400 Bad request
-
-: [client ] HTTP/1.1 400 Bad request
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 400 Bad request
-
-: [client ] HTTP/1.1 400 Bad request
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 505 HTTP Version not supported
-
-: [client ] HTTP/1.1 505 HTTP Version not supported
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-04-29 14:56:41] [info] [pid 19919] src/Apache_log.c: HTTP/1.1 400 Bad request
-
-: [client ] HTTP/1.1 400 Bad request
-
-
-[2025-05-12 15:36:01] [info] [pid 25744] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-05-12 15:38:16] [info] [pid 26528] src/Apache_log.c: HTTP/1.1 501 Not Implemented
-
-: [client ] HTTP/1.1 501 Not Implemented
-
-
-[2025-05-12 15:38:16] [info] [pid 26528] src/Apache_log.c: HTTP/1.1 501 Not Implemented
+[2025-05-24 21:36:48] [info] [pid 2526] src/Apache_log.c: HTTP/1.1 501 Not Implemented
 
 : [client ] HTTP/1.1 501 Not Implemented
 

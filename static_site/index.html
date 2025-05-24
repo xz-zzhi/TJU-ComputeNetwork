@@ -1,20 +1,94 @@
-<!DOCTYPE html> 
-<html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title>Liso the Friendly Web Server</title>
-        <link rel="stylesheet" type="text/css" href="style.css" /> 
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 页面元信息和样式 -->
+  <meta charset="utf-8">
+  <title>Liso the Friendly Web Server</title>
+  <!-- 引入 Google 字体 Poppins -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+  <style>
+    /* 全局重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      /* 渐变背景 */
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      /* 若要使用背景图：注释上面一行并解开下面示例，替换路径 */
+      /* background: url('images/your_index_bg.jpg') no-repeat center/cover; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    #container {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+      max-width: 400px;
+      width: 90%;
+    }
+    /* 渐变标题文字 */
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      background: -webkit-linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.desc { color: #333; margin-bottom: 1.5rem; }
+    /* 按钮样式 */
+    .btn {
+      display: inline-block;
+      width: 140px;
+      margin: 0.5rem;
+      padding: 0.6rem 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(90deg, #11998e, #38ef7d);
+      transition: transform 0.2s;
+    }
+    .btn:hover { transform: scale(1.05); }
+    /* 页面头图 */
+    #container img.header { max-width: 100%; height: auto; margin-bottom: 1rem; }
+    /* 版权文字 */
+    #footer { margin-top: 1.5rem; font-size: 0.8rem; color: #555; }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- 可替换标题图，下方注释示例 -->
+    <img class="header" src="/images/liso_header.png" alt="Liso Logo">
+    <!-- 如果想替换为其他图片：
+    <img class="header" src="/images/your_header.jpg" alt="Your Logo">
+    -->
 
-    <body>
-        <div id="page">
-            <img src="images/liso_header.png" alt="Liso the Friendly Web Server"></img>
-            <p>Welcome to the Liso 1.0 web server.  If you see this page then
-               congratulations!  Your Liso web server is up and running now!</p>
-            <p>This Liso web server was implemented by: xxxxxxx
-               &#60;<a href="mailto:xxxxx@andrew.cmu.edu">xxxxx@andrew.cmu.edu
-                    </a>&#62;</p>
-        </div>
-    </body>
+    <h1>Welcome to Liso 1.0</h1>
+    <p class="desc">Congratulations!</p>
+    <p class="desc">Implemented by 3023244234 zxz tju &lt;<a href="mailto:1577854908@qq.com">1577854908@qq.com</a>&gt;</p>
 
+    <!-- 方法一：使用普通链接避免问号 -->
+    <a href="/cgiget.html"><button class="btn" type="button">Test CGI GET</button></a>
+    <a href="/cgipost.html"><button class="btn" type="button">Test CGI POST</button></a>
+
+    <!-- 方法二：使用 JavaScript 跳转（可选替换） -->
+    <!--
+    <button class="btn" type="button" onclick="location.href='/cgiget.html'">Test CGI GET</button>
+    <button class="btn" type="button" onclick="location.href='/cgipost.html'">Test CGI POST</button>
+    -->
+
+    <!-- 可替换底部图示例：
+    <img src="/images/your_footer.png" alt="Footer Image" style="margin-top:1rem; max-width:100%;">
+    -->
+
+    <div id="footer">&copy; 3023244234 zxz tju</div>
+  </div>
+</body>
 </html>

@@ -19,7 +19,8 @@ void get_other_msg(Request* r,int response_status,int response_bytes,char* error
     if(r==NULL) {
         return;
     }
-    r->client_ip=client_ip;
+    // r->client_ip=client_ip;
+    strcpy(r->client_ip,client_ip);
     r->error_message=error_message;
     r->response_status=response_status;
     r->response_bytes=response_bytes;
