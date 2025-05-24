@@ -3,8 +3,8 @@
 #include "http_data.h"
 #include "response.h"
 
-char* ret_head="Server: Liso/1.0\r\nDate: Mon, 22 May 2025 0:47:44 CST\r\n";
-char* ret_head2="Last-modified: Mon, 22 May 2025 10:20:31 GMT\r\nConnection: keep-alive\r\n";
+char* ret_head="Server: Liso/1.0\r\nDate: Mon, 23 May 2025 0:47:44 CST\r\n";
+char* ret_head2="Last-modified: Mon, 23 May 2025 10:20:31 GMT\r\nConnection: keep-alive\r\n";
 
 #include <stdio.h>
 #include <stdlib.h>

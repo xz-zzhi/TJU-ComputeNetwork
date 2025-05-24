@@ -88,9 +88,12 @@
     }
 
     function doLogin() {
-      var u = encodeURIComponent(document.getElementById('txtUserName').value);
-      var p = encodeURIComponent(document.getElementById('txtPassword').value);
-      if (!u||!p) { alert('请输入用户名和密码'); return; }
+      // 获取原始输入
+      var plainU = document.getElementById('txtUserName').value;
+      var plainP = document.getElementById('txtPassword').value;
+      var u = encodeURIComponent(plainU);
+      var p = encodeURIComponent(plainP);
+      if (!plainU || !plainP) { alert('请输入用户名和密码'); return; }
       var xhr = new XMLHttpRequest();
       xhr.open('GET','/CGI/login.py?uName='+u+'&uPass='+p,true);
       xhr.onload = function() {
@@ -104,7 +107,8 @@
             var obj = JSON.parse(jsonText);
             msg.innerText = '登录结果：' + obj.Msg;
             if (obj.Code==='200') {
-              demo.innerText = '用户名：' + obj.Results.name;
+              // 打印用户名和密码
+              demo.innerText = '用户名：' + obj.Results.name + '，密码：' + plainP;
               info.innerText = '来自 IP：' + obj.Results.last_ip +
                                '，用户ID：' + obj.Results.u_id;
             } else {
@@ -126,9 +130,12 @@
     }
 
     function doRegister() {
-      var u = encodeURIComponent(document.getElementById('txtUserName').value);
-      var p = encodeURIComponent(document.getElementById('txtPassword').value);
-      if (!u||!p) { alert('请输入用户名和密码'); return; }
+      // 获取原始输入
+      var plainU = document.getElementById('txtUserName').value;
+      var plainP = document.getElementById('txtPassword').value;
+      var u = encodeURIComponent(plainU);
+      var p = encodeURIComponent(plainP);
+      if (!plainU || !plainP) { alert('请输入用户名和密码'); return; }
       var xhr = new XMLHttpRequest();
       xhr.open('GET','/CGI/register.py?uName='+u+'&uPass='+p,true);
       xhr.onload = function() {
@@ -142,8 +149,8 @@
             var obj = JSON.parse(jsonText);
             msg.innerText = '注册结果：' + obj.Msg;
             if (obj.Code==='200') {
-              demo.innerText = '用户名：' + obj.Results.name +
-                               '，密码：' + obj.Results.pass;
+              // 打印用户名和密码
+              demo.innerText = '用户名：' + obj.Results.name + '，密码：' + plainP;
               info.innerText = '用户ID：' + obj.Results.u_id;
             } else {
               demo.innerText = '来自 IP：' + obj.Results.Ip;
