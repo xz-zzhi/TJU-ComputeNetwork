@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- 页面元信息和样式 -->
+  <meta charset="utf-8">
+  <title>Liso 登录 / 注册（POST）</title>
+  <!-- 引入谷歌字体 Poppins -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+  <style>
+    /* 全局重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* 背景渐变或图片，可替换 */
+    body {
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      background: linear-gradient(135deg, #4b6cb7, #182848);
+      /* 若使用背景图片，请注释上面一行，并取消注释：
+      background: url('images/your_bg_post.jpg') no-repeat center/cover;
+      */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #eee;
+    }
+    /* 卡片容器 */
+    #card {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 2rem;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    }
+    /* 渐变标题 */
+    #card h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: -webkit-linear-gradient(45deg, #fad0c4, #ffd1ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    #card h2 {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #ccc;
+      margin-bottom: 1.5rem;
+    }
+    /* 输入框 */
+    .input-field {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.7rem 0;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    .input-field::placeholder { color: #bbb; }
+    /* 按钮 */
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #11998e, #38ef7d);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: linear-gradient(90deg, #38ef7d, #11998e); }
+    /* 消息区域 */
+    #msgs { margin-top: 1.5rem; font-size: 0.9rem; }
+    #msgs p { margin: 0.3rem 0; }
+    /* 可替换 Logo */
+    .logo { width: 80px; margin-bottom: 1rem; }
+    /* 版权 */
+    #footer { margin-top: 1.5rem; font-size: 0.8rem; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div id="card">
+    <!-- 可替换 Logo -->
+    <!-- <img class="header" src="images/liso_header.png" alt="Liso Logo"> -->
+    <img class="logo" src="images/liso_header.png" alt="Liso the Friendly Web Server">
+    
+    <!-- 若替换：
+    <img class="logo" src="images/your_logo_post.png" alt="Your Logo">
+    -->
+
+    <h1>登录 / 注册</h1>
+    <h2>使用 POST 方法</h2>
+
+    <!-- 表单输入 -->
+    <input id="txtUserName" class="input-field" type="text" placeholder="用户名">
+    <input id="txtPassword" class="input-field" type="password" placeholder="密码">
+
+    <!-- 按钮 -->
+    <button class="btn" onclick="doLogin()">LOGIN</button>
+    <button class="btn" onclick="doRegister()">REGISTER</button>
+
+    <!-- 消息显示 -->
+    <div id="msgs">
+      <p id="Msg"></p>
+      <p id="demo"></p>
+      <p id="info"></p>
+    </div>
+
+    <div id="footer">&copy; 3023244234 zxz tju</div>
+  </div>
+
+  <!-- AJAX POST 逻辑 -->
+  <script>
+    function doLogin() {
+      var u=document.getElementById('txtUserName').value;
+      var p=document.getElementById('txtPassword').value;
+      if(!u||!p){alert('请输入用户名和密码');return;}
+      var xhr=new XMLHttpRequest();
+      xhr.open('POST','/CGI/login.py',true);
+      xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+      xhr.onload=function(){
+        var msg=document.getElementById('Msg'),demo=document.getElementById('demo'),info=document.getElementById('info');
+        if(xhr.status===200){
+          try{var obj=JSON.parse(xhr.responseText);
+            msg.innerText='登录结果：';
+            demo.innerText='来自 IP:'+obj.Results.Ip+' 的 '+decodeURIComponent(obj.Results.name);
+            info.innerText=obj.Code==='400'?'登录失败：'+obj.Msg:'登录成功，您是第 '+obj.Results.number+' 位';
+          }catch(e){info.innerText='返回数据解析错误';}}
+        else info.innerText='HTTP 错误：'+xhr.status;
+      };
+      xhr.send('uName='+encodeURIComponent(u)+'&uPass='+encodeURIComponent(p));
+    }
+    function doRegister() {
+      var u=document.getElementById('txtUserName').value;
+      var p=document.getElementById('txtPassword').value;
+      if(!u||!p){alert('请输入用户名和密码');return;}
+      var xhr=new XMLHttpRequest();
+      xhr.open('POST','/CGI/register.py',true);
+      xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+      xhr.onload=function(){
+        var msg=document.getElementById('Msg'),demo=document.getElementById('demo'),info=document.getElementById('info');
+        if(xhr.status===200){
+          try{var obj=JSON.parse(xhr.responseText);
+            msg.innerText='注册结果：';
+            info.innerText=obj.Code==='400'?'注册失败：'+obj.Msg:'注册成功，您的密码：'+obj.Results.pass;
+            demo.innerText=obj.Code==='400'?'':'您是第 '+obj.Results.number+' 位';
+          }catch(e){info.innerText='返回数据解析错误';}}
+        else info.innerText='HTTP 错误：'+xhr.status;
+      };
+      xhr.send('uName='+encodeURIComponent(u)+'&uPass='+encodeURIComponent(p));
+    }
+  </script>
+</body>
+</html>

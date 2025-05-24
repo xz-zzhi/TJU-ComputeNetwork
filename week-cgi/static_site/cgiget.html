@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- 页面元信息和样式 -->
+  <meta charset="utf-8">
+  <title>Liso 登录 / 注册（GET）</title>
+  <!-- 引入谷歌字体 Poppins -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+  <style>
+    /* 全局重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #eee;
+    }
+    #card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 2rem;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+    }
+    #card h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: -webkit-linear-gradient(45deg,#ff9a9e,#fad0c4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: .5rem;
+    }
+    #card h2 {
+      font-size: 1rem; font-weight: 400; color: #ddd; margin-bottom:1.5rem;
+    }
+    .input-field {
+      width:100%; padding:.6rem; margin:.7rem 0;
+      border:none; border-radius:6px;
+      background:rgba(255,255,255,0.2);
+      color:#fff; font-size:.95rem;
+    }
+    .input-field::placeholder{color:#ccc;}
+    .btn {
+      width:100%; padding:.8rem; margin:.5rem 0;
+      border:none; border-radius:6px;
+      font-size:1rem; font-weight:600;
+      background:linear-gradient(90deg,#ff758c,#ff7eb3);
+      color:#fff; cursor:pointer; transition:background .3s;
+    }
+    .btn:hover { background:linear-gradient(90deg,#ff7eb3,#ff758c); }
+    #msgs { margin-top:1.5rem; font-size:.9rem; text-align:left; }
+    #msgs p { margin:.3rem 0; word-break:break-all; }
+    .logo { width:80px; margin-bottom:1rem; }
+    #footer { margin-top:1.5rem; font-size:.8rem; color:#aaa; }
+  </style>
+</head>
+<body>
+  <div id="card">
+    <img class="logo" src="images/liso_header.png" alt="Liso the Friendly Web Server">
+    <h1>登录 / 注册</h1>
+    <h2>使用 GET 方法</h2>
+    <input id="txtUserName" class="input-field" type="text" placeholder="用户名">
+    <input id="txtPassword" class="input-field" type="password" placeholder="密码">
+    <button class="btn" onclick="doLogin()">LOGIN</button>
+    <button class="btn" onclick="doRegister()">REGISTER</button>
+    <div id="msgs">
+      <p id="Msg"></p>
+      <p id="demo"></p>
+      <p id="info"></p>
+    </div>
+    <div id="footer">&copy; 3023244234 zxz tju</div>
+  </div>
+
+  <script>
+    // 从 responseText 中提取出最外层的 JSON 对象
+    function extractJSON(txt) {
+      var start = txt.indexOf('{'),
+          end   = txt.lastIndexOf('}');
+      if (start !== -1 && end !== -1 && end > start) {
+        return txt.substring(start, end+1);
+      }
+      return null;
+    }
+
+    function doLogin() {
+      var u = encodeURIComponent(document.getElementById('txtUserName').value);
+      var p = encodeURIComponent(document.getElementById('txtPassword').value);
+      if (!u||!p) { alert('请输入用户名和密码'); return; }
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','/CGI/login.py?uName='+u+'&uPass='+p,true);
+      xhr.onload = function() {
+        var raw = xhr.responseText,
+            jsonText = extractJSON(raw),
+            msg  = document.getElementById('Msg'),
+            demo = document.getElementById('demo'),
+            info = document.getElementById('info');
+        if (xhr.status===200 && jsonText) {
+          try {
+            var obj = JSON.parse(jsonText);
+            msg.innerText = '登录结果：' + obj.Msg;
+            if (obj.Code==='200') {
+              demo.innerText = '用户名：' + obj.Results.name;
+              info.innerText = '来自 IP：' + obj.Results.last_ip +
+                               '，用户ID：' + obj.Results.u_id;
+            } else {
+              demo.innerText = '来自 IP：' + obj.Results.Ip;
+              info.innerText = '';
+            }
+          } catch(e) {
+            msg.innerText = '登录结果：';
+            demo.innerText = '';
+            info.innerText = '返回数据解析错误';
+          }
+        } else {
+          msg.innerText = '登录结果：';
+          demo.innerText = '';
+          info.innerText = 'HTTP 错误或未获取到 JSON';
+        }
+      };
+      xhr.send();
+    }
+
+    function doRegister() {
+      var u = encodeURIComponent(document.getElementById('txtUserName').value);
+      var p = encodeURIComponent(document.getElementById('txtPassword').value);
+      if (!u||!p) { alert('请输入用户名和密码'); return; }
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','/CGI/register.py?uName='+u+'&uPass='+p,true);
+      xhr.onload = function() {
+        var raw = xhr.responseText,
+            jsonText = extractJSON(raw),
+            msg  = document.getElementById('Msg'),
+            demo = document.getElementById('demo'),
+            info = document.getElementById('info');
+        if (xhr.status===200 && jsonText) {
+          try {
+            var obj = JSON.parse(jsonText);
+            msg.innerText = '注册结果：' + obj.Msg;
+            if (obj.Code==='200') {
+              demo.innerText = '用户名：' + obj.Results.name +
+                               '，密码：' + obj.Results.pass;
+              info.innerText = '用户ID：' + obj.Results.u_id;
+            } else {
+              demo.innerText = '来自 IP：' + obj.Results.Ip;
+              info.innerText = '';
+            }
+          } catch(e) {
+            msg.innerText = '注册结果：';
+            demo.innerText = '';
+            info.innerText = '返回数据解析错误';
+          }
+        } else {
+          msg.innerText = '注册结果：';
+          demo.innerText = '';
+          info.innerText = 'HTTP 错误或未获取到 JSON';
+        }
+      };
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
